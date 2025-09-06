@@ -145,55 +145,55 @@ if __name__ == "__main__":
         description="Generate Instagram Reels style video parts."
     )
     parser.add_argument(
-        "--input_video", type=str, default="input.mp4", help="Input video"
+        "--input-video", type=str, default=None, required=True, help="Input video"
     )
     parser.add_argument(
-        "--background_image",
+        "--background-image",
         type=str,
         default="background.png",
         help="Optional background",
     )
     parser.add_argument(
-        "--logo_image", type=str, default="logo.png", help="Optional logo"
+        "--logo-image", type=str, default="logo.png", help="Optional logo"
     )
     parser.add_argument(
         "--username", type=str, default="@username", help="Overlay username text"
     )
     parser.add_argument(
-        "--video_title", type=str, default="Video Title", help="Title text"
+        "--video-title", type=str, default="Video Title", help="Title text"
     )
     parser.add_argument(
-        "--part_duration", type=int, default=30, help="Duration of each part in seconds"
+        "--part-duration", type=int, default=30, help="Duration of each part in seconds"
     )
     parser.add_argument(
-        "--username_font",
+        "--username-font",
         type=str,
         default="fonts/Montserrat-Italic.ttf",
         help="Font for username",
     )
     parser.add_argument(
-        "--title_font",
+        "--title-font",
         type=str,
         default="fonts/Philosopher-Bold.ttf",
         help="Font for title",
     )
     parser.add_argument(
-        "--part_font",
+        "--part-font",
         type=str,
         default="fonts/MarckScript-Regular.ttf",
         help="Font for part text",
     )
     parser.add_argument(
-        "--username_color", type=str, default="#0b789a", help="Username text color"
+        "--username-color", type=str, default="#0b789a", help="Username text color"
     )
     parser.add_argument(
-        "--title_color", type=str, default="#0b789a", help="Title text color"
+        "--title-color", type=str, default="#0b789a", help="Title text color"
     )
     parser.add_argument(
-        "--part_color", type=str, default="#0b789a", help="Part text color"
+        "--part-color", type=str, default="#0b789a", help="Part text color"
     )
     parser.add_argument(
-        "--output_base", type=str, default="output", help="Base output folder"
+        "--output-base", type=str, default="output", help="Base output folder"
     )
 
     args = parser.parse_args()
