@@ -60,7 +60,7 @@ sudo apt-get install imagemagick
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/deepaksahani877/video-splitter-for-shorts-reel.git
-cd VideoSplitter
+cd video-splitter-for-shorts-reel
 ```
 
 ### 2. Create Virtual Environment
