@@ -2,15 +2,19 @@ import os
 import uuid
 import shutil
 import argparse
+import platform
 
 from moviepy.editor import VideoFileClip, ImageClip, CompositeVideoClip, TextClip
 from moviepy.video.fx.resize import resize
 from moviepy.config import change_settings
 
 # Path to your ImageMagick binary
-change_settings(
-    {"IMAGEMAGICK_BINARY": r"C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe"}
-)
+if platform.system() == "Windows":
+    change_settings(
+        {
+            "IMAGEMAGICK_BINARY": r"C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe"
+        }
+    )
 
 # Video configuration
 VIDEO_WIDTH = 1080
@@ -76,7 +80,10 @@ def generate_reels_parts(
 
             # --- Username overlay ---
             username_text = TextClip(
-                f'/{username[1:]}', fontsize=30, font=username_font, color=username_color
+                f"/{username[1:]}",
+                fontsize=30,
+                font=username_font,
+                color=username_color,
             ).set_duration(subclip.duration)
             if logo_clip:
                 # Align vertical center of username text with logo
