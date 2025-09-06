@@ -59,7 +59,7 @@ sudo apt-get install imagemagick
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/VideoSplitter.git
+git clone https://github.com/deepaksahani877/video-splitter-for-shorts-reel.git
 cd VideoSplitter
 ```
 
