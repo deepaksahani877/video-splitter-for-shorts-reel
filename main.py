@@ -8,7 +8,7 @@ from moviepy.editor import VideoFileClip, ImageClip, CompositeVideoClip, TextCli
 from moviepy.video.fx.resize import resize
 from moviepy.config import change_settings
 
-# Path to your ImageMagick binary
+# Configure ImageMagick path for Windows
 if platform.system() == "Windows":
     change_settings(
         {
@@ -23,6 +23,8 @@ VIDEO_HEIGHT = 1920
 
 def generate_reels_parts(
     input_video: str,
+    start: int = 0,
+    end: int = None,
     background_image: str = None,
     logo_image: str = None,
     username: str = "@username",
@@ -39,6 +41,12 @@ def generate_reels_parts(
     clip = VideoFileClip(input_video)
     duration = clip.duration
 
+    # Validate start/end
+    start = max(0, start)
+    end = min(duration, end) if end else duration
+    if start >= end:
+        raise ValueError("Start time must be less than end time.")
+
     project_id = str(uuid.uuid4())[:8]
     output_folder = os.path.join(output_base, f"{video_title}_{project_id}")
     os.makedirs(output_folder, exist_ok=True)
@@ -47,9 +55,9 @@ def generate_reels_parts(
     os.makedirs(temp_dir, exist_ok=True)
 
     try:
-        for i, start in enumerate(range(0, int(duration), part_duration), 1):
-            end = min(start + part_duration, duration)
-            subclip = clip.subclip(start, end)
+        for i, t in enumerate(range(start, int(end), part_duration), 1):
+            subclip_end = min(t + part_duration, end)
+            subclip = clip.subclip(t, subclip_end)
 
             # --- Background ---
             if background_image and os.path.exists(background_image):
@@ -79,23 +87,28 @@ def generate_reels_parts(
                 logo_clip = logo_clip.set_position((logo_x, logo_y))
 
             # --- Username overlay ---
-            username_text = TextClip(
-                f"/{username[1:]}",
-                fontsize=30,
-                font=username_font,
-                color=username_color,
-            ).set_duration(subclip.duration)
             if logo_clip:
-                # Align vertical center of username text with logo
+                username_text = TextClip(
+                    f"/{username[1:]}",
+                    fontsize=30,
+                    font=username_font,
+                    color=username_color,
+                ).set_duration(subclip.duration)
                 username_x = logo_x + logo_clip.w + 10
                 username_y = logo_y + (logo_clip.h - username_text.h) / 2
                 username_text = username_text.set_position((username_x, username_y))
             else:
                 username_text = TextClip(
-                    username, fontsize=30, font=username_font, color=username_color
+                    username,
+                    fontsize=30,
+                    font=username_font,
+                    color=username_color,
                 ).set_duration(subclip.duration)
                 username_text = username_text.set_position(
-                    (VIDEO_WIDTH - username_text.w - 50, VIDEO_HEIGHT - 50)
+                    (
+                        VIDEO_WIDTH - username_text.w - 50,
+                        VIDEO_HEIGHT - username_text.h - 50,
+                    )
                 )
 
             # --- Title and part overlays ---
@@ -113,10 +126,8 @@ def generate_reels_parts(
             # --- Compose all clips ---
             clips_to_compose = [bg, scaled_video]
             if logo_clip:
-                clips_to_compose.append(logo_clip)  # logo above video
-            clips_to_compose.extend(
-                [title_text, part_text, username_text]
-            )  # all texts on top
+                clips_to_compose.append(logo_clip)
+            clips_to_compose.extend([title_text, part_text, username_text])
 
             final = CompositeVideoClip(
                 clips_to_compose, size=(VIDEO_WIDTH, VIDEO_HEIGHT)
@@ -147,13 +158,11 @@ def generate_reels_parts(
     print(f"\n🎉 All parts saved in {output_folder}")
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         description="Generate Instagram Reels style video parts."
     )
-    parser.add_argument(
-        "--input-video", type=str, default=None, required=True, help="Input video"
-    )
+    parser.add_argument("--input-video", type=str, required=True, help="Input video")
     parser.add_argument(
         "--background-image",
         type=str,
@@ -202,11 +211,19 @@ if __name__ == "__main__":
     parser.add_argument(
         "--output-base", type=str, default="output", help="Base output folder"
     )
+    parser.add_argument(
+        "--start", type=int, default=0, help="Start time in seconds to begin splitting"
+    )
+    parser.add_argument(
+        "--end", type=int, default=None, help="End time in seconds to stop splitting"
+    )
 
     args = parser.parse_args()
 
     generate_reels_parts(
         input_video=args.input_video,
+        start=args.start,
+        end=args.end,
         background_image=args.background_image,
         logo_image=args.logo_image,
         username=args.username,
@@ -220,3 +237,10 @@ if __name__ == "__main__":
         part_color=args.part_color,
         output_base=args.output_base,
     )
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt as e:
+        print('Video split operation cancelled!')
