@@ -120,7 +120,7 @@ def generate_reels_parts(
             part_text = (
                 TextClip(f"Part {i}", fontsize=60, font=part_font, color=part_color)
                 .set_duration(subclip.duration)
-                .set_position(("center", VIDEO_HEIGHT - 170))
+                .set_position(("center", VIDEO_HEIGHT - 250))
             )
 
             # --- Compose all clips ---
