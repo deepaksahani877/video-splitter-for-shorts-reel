@@ -42,6 +42,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "output_base": "output",
     "start": 0,
     "end": None,
+    "initial_part":0
 }
 
 
@@ -94,6 +95,7 @@ def generate_reels_parts(
     input_video: str,
     start: int = 0,
     end: int = None,
+    initial_part = 0,
     background_image: str = None,
     logo_image: str = None,
     username: str = "@username",
@@ -124,7 +126,12 @@ def generate_reels_parts(
     os.makedirs(temp_dir, exist_ok=True)
 
     try:
-        for i, t in enumerate(range(start, int(end), part_duration), 1):
+        for i, t in enumerate(range(start, int(end), part_duration), initial_part):
+            
+            #if index is 1 ie. initial stage of calculation part no if inital_part is given
+            if(i==1):
+                i=initial_part
+            
             subclip_end = min(t + part_duration, end)
             subclip = clip.subclip(t, subclip_end)
 
@@ -304,6 +311,12 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         help="End time in seconds to stop splitting (CLI overrides config). Use nothing for video end.",
     )
+    
+    parser.add_argument(
+        "--initial-part",
+        type=int,
+        help="End time in seconds to stop splitting (CLI overrides config). Use nothing for video end.",
+    )
 
     return parser
 
@@ -327,7 +340,7 @@ def merge_config_and_cli(
             merged[key] = default_value
 
     # Coerce type-sensible fields to ints if not None
-    for int_key in ("part_duration", "start", "end"):
+    for int_key in ("part_duration", "start", "end",'initial_part'):
         if merged.get(int_key) is not None:
             try:
                 merged[int_key] = int(merged[int_key])
@@ -370,6 +383,7 @@ def main():
         title_color=final_args["title_color"],
         part_color=final_args["part_color"],
         output_base=final_args["output_base"],
+        initial_part=final_args['initial_part']
     )
 
 
